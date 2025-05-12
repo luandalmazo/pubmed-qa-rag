@@ -1,0 +1,25 @@
+Perguntas,Campo
+"Quais dados epidemiológicos, estatísticas ou fatos históricos o(s) autor(es) citam? Como o problema é caracterizado (escala, gravidade, tendência)?",Introdução
+"Que limitações ou falhas da literatura anterior são destacadas? Os autores mencionam contradições, escassez de estudos em determinado grupo populacional, desfecho ou contexto?",Introdução
+O objetivo está claramente delimitado (PICO/PCC)? Há hipótese explícita?,Introdução
+"Já na introdução aparece quem é o público-alvo (idade, condição clínica) e em que cenário (hospital, comunidade)?",Introdução
+"O estudo se ancora em alguma teoria, framework ou modelo lógico?",Introdução
+"Há definições operacionais importantes (p.ex. modelos estatísticos, ética, informática em saúde)?",Introdução
+"Os autores explicam implicações para políticas públicas, clínica ou tecnologia?",Introdução
+"Citam revisões sistemáticas, guias clínicos ou recomendações oficiais para justificar o estudo?",Introdução
+"Existe parágrafo final indicando organização dos tópicos (“Os próximos itens apresentam métodos, resultados…”)?",Introdução
+"Quais dados epidemiológicos, estatísticas ou fatos históricos o(s) autor(es) citam? Como o problema é caracterizado (escala, gravidade, tendência)?",Metodologia
+"Que limitações ou falhas da literatura anterior são destacadas? Os autores mencionam contradições, escassez de estudos em determinado grupo populacional, desfecho ou contexto?",Metodologia
+O objetivo está claramente delimitado (PICO/PCC)? Há hipótese explícita?,Metodologia
+"Já na introdução aparece quem é o público-alvo (idade, condição clínica) e em que cenário (hospital, comunidade)?",Metodologia
+"O estudo se ancora em alguma teoria, framework ou modelo lógico?",Metodologia
+"Há definições operacionais importantes (p.ex. modelos estatísticos, ética, informática em saúde)?",Metodologia
+"Os autores explicam implicações para políticas públicas, clínica ou tecnologia?",Metodologia
+"Citam revisões sistemáticas, guias clínicos ou recomendações oficiais para justificar o estudo?",Metodologia
+"Existe parágrafo final indicando organização dos tópicos (“Os próximos itens apresentam métodos, resultados…”)?",Metodologia
+"O tipo de estudo (transversal, coorte, caso-controle, ensaio, método misto) está declarado e justificado?",Metodologia
+A população foi claramente definida? Critérios de inclusão/exclusão estão descritos? Processo de seleção (amostragem probabilística ou não) é explicado? Houve cálculo de tamanho amostral ou justificativa de saturação?,Metodologia
+Onde e quando os dados foram coletados? As condições do ambiente podem influenciar os resultados?,Metodologia
+"Cada variável (exposição, desfecho, covariáveis) possui definição clara e mensurável? Há fundamentação teórica ou referências para essas definições?",Metodologia
+"Questionários, escalas, sensores ou registros eletrônicos são descritos em detalhe? Foram utilizados instrumentos validados (idioma, cultura) e com confiabilidade testada? Treinamento dos coletores está relatado?",Metodologia
+"Passo a passo (piloto, abordagem aos participantes, número de contatos) aparece? Há padronização entre coletores (manual, checklist)?",Metodologia

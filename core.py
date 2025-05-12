@@ -1,43 +1,114 @@
-from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import FAISS
-from langchain.chat_models import ChatOllama
-from langchain.chains import ConversationalRetrievalChain
-from langchain.prompts import PromptTemplate
+from core import build_qa_chain 
+import requests
+import xml.etree.ElementTree as ET
+import pandas as pd
 
-def build_qa_chain(pdf_path="article/example.pdf"):
-    loader = PyPDFLoader(pdf_path)
-    documents = loader.load()
+ESEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
+ESUMMARY_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
+EFETCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
 
-    splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=100) 
-    docs = splitter.split_documents(documents)
+def get_article_summary(DOI):
+    esearch_params = {
+        "db": "pubmed",
+        "term": f"{DOI}[DOI]",
+        "retmode": "xml"
+    }
 
-    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-    db = FAISS.from_documents(docs, embeddings)
-    retriever = db.as_retriever(search_kwargs={"k": 4})
+    esearch_response = requests.get(ESEARCH_URL, params=esearch_params)
+    esearch_tree = ET.fromstring(esearch_response.text)
+    id_elem = esearch_tree.find(".//Id")
 
-    llm = ChatOllama(model="llama3:8b")
+    if id_elem is None:
+        print("PMID não encontrado para o DOI informado.")
+        return
 
-    template = """
-    Você é um assistente que responde estritamente com base no conteúdo do documento fornecido.
-    Se a resposta não estiver no texto, diga: "Não sei com base no PDF fornecido."
+    pmid = id_elem.text
+    print(f"PMID encontrado: {pmid}")
 
-    Contexto:
-    {context}
+    esummary_params = {
+        "db": "pubmed",
+        "id": pmid,
+        "retmode": "xml"
+    }
 
-    Pergunta: {question}
-    """
-    QA_PROMPT = PromptTemplate(
-        input_variables=["context", "question"],
-        template=template,
-    )
+    esummary_response = requests.get(ESUMMARY_URL, params=esummary_params)
+    esummary_tree = ET.fromstring(esummary_response.text)
+    docsum = esummary_tree.find(".//DocSum")
 
-    qa_chain = ConversationalRetrievalChain.from_llm(
-        llm=llm,
-        retriever=retriever,
-        return_source_documents=True,
-        combine_docs_chain_kwargs={"prompt": QA_PROMPT}
-    )
+    info = {}
+    if docsum is not None:
+        for item in docsum.findall("Item"):
+            name = item.attrib.get("Name")
+            if name in ["Title", "Source", "PubDate", "AuthorList"]:
+                info[name] = item.text if name != "AuthorList" else [author.text for author in item.findall("Item")]
 
-    return qa_chain
+    efetch_params = {
+        "db": "pubmed",
+        "id": pmid,
+        "retmode": "xml"
+    }
+
+    efetch_response = requests.get(EFETCH_URL, params=efetch_params)
+    efetch_tree = ET.fromstring(efetch_response.text)
+    article = efetch_tree.find(".//PubmedArticle")
+
+    language = article.findtext(".//Language")
+    country = article.findtext(".//MedlineJournalInfo/Country")
+    publication_type = article.findtext(".//PublicationType")
+
+    afiliacoes = set()
+    for affil in article.findall(".//AffiliationInfo/Affiliation"):
+        afiliacoes.add(affil.text)
+
+    print("\nInformações do Artigo:")
+    print(f"Título do artigo: {info.get('Title', 'N/A')}")
+    print(f"Título do Periódico: {info.get('Source', 'N/A')}")
+    print(f"Autores: {', '.join(info.get('AuthorList', []))}")
+    print(f"Ano de Publicação: {info.get('PubDate', 'N/A')}")
+    print(f"Idioma: {language or 'N/A'}")
+    print(f"País: {country or 'N/A'}")
+    print(f"Tipo de Publicação: {publication_type or 'N/A'}")
+    print("Afiliações:")
+    for a in afiliacoes:
+        print(f" - {a}")
+
+
+if __name__ == "__main__":
+    print("Iniciado.") 
+
+    DOI = "10.1038/s41436-018-0299-7"
+    get_article_summary(DOI)
+    
+    chat_history = []
+    qa_chain = build_qa_chain("article/article.pdf")
+
+    df = pd.read_csv("questions.csv")  
+    respostas = [] 
+
+    for _, row in df.iterrows():
+        pergunta_contextualizada = f"Na {row['Campo'].lower()}, {row['Perguntas']}"
+        print("\n❓ Pergunta:", pergunta_contextualizada)
+
+        result = qa_chain({"question": pergunta_contextualizada, "chat_history": chat_history})
+        resposta = result["answer"]
+        trecho = result["source_documents"][0].page_content
+
+        print("--------------------------------------------------------")
+        print("\n💬 Resposta:", resposta)
+        print("\n🔍 Fonte – Trecho do documento:")
+        print(trecho)
+        print("======================================")
+
+        respostas.append({
+            "Campo": row['Campo'],
+            "Pergunta": row['Perguntas'],
+            "PerguntaContextualizada": pergunta_contextualizada,
+            "Resposta": resposta,
+            "TrechoFonte": trecho
+        })
+
+    df_respostas = pd.DataFrame(respostas)
+    df_respostas.to_csv("answer.csv", index=False)
+
+    print("Respostas salvas em answer.csv.")
+    print("Adeus..")
