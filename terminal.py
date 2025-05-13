@@ -1,31 +1,11 @@
 from core import build_qa_chain 
 import requests
 import xml.etree.ElementTree as ET
+import pandas as pd
 
 ESEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
 ESUMMARY_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
 EFETCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-
-DICT_QUESTIONS = {
-    "D.1": (
-        "Qual é a natureza metodológica da publicação?\n"
-        "Se for pesquisa, indique a abordagem e o delineamento:\n"
-        "  1.1 Pesquisa:\n"
-        "    - ( ) Abordagem quantitativa:\n"
-        "        • ( ) Delineamento experimental\n"
-        "        • ( ) Delineamento quase-experimental\n"
-        "        • ( ) Delineamento não-experimental\n"
-        "    - ( ) Abordagem qualitativa\n"
-        "Se não for pesquisa, indique o tipo:\n"
-        "  1.2 ( ) Revisão de literatura\n"
-        "  1.3 ( ) Relato de experiência\n"
-        "  1.4 ( ) Outras (especificar)"
-    ),
-
-    "D.2": (
-        "Qual o objetivo ou questão de investigação?"
-    )
-}
 
 def get_article_summary(DOI):
     esearch_params = {
@@ -96,25 +76,40 @@ def get_article_summary(DOI):
 if __name__ == "__main__":
     print("Iniciado. Digite 'sair' para sair.") 
 
-    ''' Get article summary from PubMed using DOI '''
+    # Get article summary from PubMed using DOI
     DOI = "10.1038/s41436-018-0299-7"
     get_article_summary(DOI)
     
     chat_history = []
     qa_chain = build_qa_chain("article/article.pdf")
 
+    df = pd.read_csv("questions.csv")  
+    respostas = []  
 
-    ''' Ask all questions in the dictionary '''
-    for question in DICT_QUESTIONS.values():
-        print("\n❓ Pergunta:", question)
-        result = qa_chain({"question": question, "chat_history": chat_history})
+    for _, row in df.iterrows():
+        pergunta_contextualizada = f"Na {row['Campo'].lower()}, {row['Perguntas']}"
+        print("\n❓ Pergunta:", pergunta_contextualizada)
+
+        result = qa_chain({"question": pergunta_contextualizada, "chat_history": chat_history})
+        resposta = result["answer"]
+        trecho = result["source_documents"][0].page_content
 
         print("--------------------------------------------------------")
-        print("\n💬 Resposta:", result["answer"])
-        print("\n🔍 Fonte – Trecho do documento:")
-        print(result["source_documents"][0].page_content)
+        print("\n💬 Resposta:", resposta)
+        #print("\n🔍 Fonte – Trecho do documento:")
+        #print(trecho)
+        print("======================================")
 
-        print ("======================================")
-        
-    
+        respostas.append({
+            "Campo": row['Campo'],
+            "Pergunta": row['Perguntas'],
+            "PerguntaContextualizada": pergunta_contextualizada,
+            "Resposta": resposta,
+            "TrechoFonte": trecho
+        })
+
+    df_respostas = pd.DataFrame(respostas)
+    df_respostas.to_csv("answer.csv", index=False)
+
+    print("Respostas salvas em answer.csv.")
     print("Adeus..")
