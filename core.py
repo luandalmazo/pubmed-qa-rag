@@ -13,7 +13,7 @@ def build_qa_chain(pdf_path="article/example.pdf"):
     splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=100) 
     docs = splitter.split_documents(documents)
 
-    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={"device": "cuda"})
     db = FAISS.from_documents(docs, embeddings)
     retriever = db.as_retriever(search_kwargs={"k": 4})
 
