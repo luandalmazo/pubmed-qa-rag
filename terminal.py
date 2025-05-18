@@ -2,6 +2,7 @@ from core import build_qa_chain
 import requests
 import xml.etree.ElementTree as ET
 import pandas as pd
+import time
 
 ESEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
 ESUMMARY_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
@@ -72,44 +73,47 @@ def get_article_summary(DOI):
     for a in afiliacoes:
         print(f" - {a}")
 
-
+   
 if __name__ == "__main__":
-    print("Iniciado. Digite 'sair' para sair.") 
 
-    # Get article summary from PubMed using DOI
-    DOI = "10.1038/s41436-018-0299-7"
-    get_article_summary(DOI)
-    
+    ''' Getting info about the article'''
+    #DOI = "10.1038/s41436-018-0299-7"
+    #get_article_summary(DOI)
+
+    print("Starting.")
+    start = time.time()
     chat_history = []
     qa_chain = build_qa_chain("article/article.pdf")
 
+    ''' Reading questions to be answered about the article '''
     df = pd.read_csv("questions.csv")  
-    respostas = []  
+    answers = []
+
 
     for _, row in df.iterrows():
-        pergunta_contextualizada = f"Na {row['Campo'].lower()}, {row['Perguntas']}"
-        print("\n❓ Pergunta:", pergunta_contextualizada)
+        contextualized_question = f"Na {row['Campo'].lower()}, {row['Perguntas']}"
+        result = qa_chain({"question": contextualized_question, "chat_history": chat_history})
+        answer = result["answer"]
 
-        result = qa_chain({"question": pergunta_contextualizada, "chat_history": chat_history})
-        resposta = result["answer"]
-        trecho = result["source_documents"][0].page_content
-
+        print("\n❓ Pergunta:", contextualized_question)
         print("--------------------------------------------------------")
-        print("\n💬 Resposta:", resposta)
-        #print("\n🔍 Fonte – Trecho do documento:")
-        #print(trecho)
+        print("\n💬 Resposta:", answer)
+        print("--------------------------------------------------------")
+
         print("======================================")
 
-        respostas.append({
+        answers.append({
             "Campo": row['Campo'],
-            "Pergunta": row['Perguntas'],
-            "PerguntaContextualizada": pergunta_contextualizada,
-            "Resposta": resposta,
-            "TrechoFonte": trecho
+            "Pergunta": row['Pergunta'],
+            "PerguntaContextualizada": contextualized_question,
+            "Resposta": answer,
         })
 
-    df_respostas = pd.DataFrame(respostas)
-    df_respostas.to_csv("answer.csv", index=False)
+    end = time.time()
 
-    print("Respostas salvas em answer.csv.")
-    print("Adeus..")
+    df_answers = pd.DataFrame(answers)
+    df_answers.to_csv("answer.csv", index=False)
+
+    print("Time taken:", end - start)
+    print("Answers saved in answer.csv.")
+    print("Goodbye..")

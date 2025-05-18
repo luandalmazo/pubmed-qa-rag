@@ -22,11 +22,13 @@ def build_qa_chain(pdf_path="article/example.pdf"):
     template = """
     Você é um assistente que responde estritamente com base no conteúdo do documento fornecido.
     Se a resposta não estiver no texto, diga: "Não sei com base no PDF fornecido."
-
+    Sempre responda em português.
+    
     Contexto:
     {context}
 
     Pergunta: {question}
+    
     """
     QA_PROMPT = PromptTemplate(
         input_variables=["context", "question"],
