@@ -3,6 +3,7 @@ import requests
 import xml.etree.ElementTree as ET
 import pandas as pd
 import time
+import torch 
 
 ESEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
 ESUMMARY_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
@@ -81,7 +82,7 @@ if __name__ == "__main__":
     #get_article_summary(DOI)
 
     print("Starting.")
-    start = time.time()
+    print("Using GPU:", torch.cuda.is_available())
     chat_history = []
     qa_chain = build_qa_chain("article/article.pdf")
 
@@ -89,9 +90,9 @@ if __name__ == "__main__":
     df = pd.read_csv("questions.csv")  
     answers = []
 
-
+    start = time.time()
     for _, row in df.iterrows():
-        contextualized_question = f"Na {row['Campo'].lower()}, {row['Perguntas']}"
+        contextualized_question = f"Na {row['Campo'].lower()}, {row['Pergunta']}"
         result = qa_chain({"question": contextualized_question, "chat_history": chat_history})
         answer = result["answer"]
 

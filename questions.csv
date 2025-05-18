@@ -1,14 +1,14 @@
-Campo, Pergunta
-Introdução, O texto fornece dados ou referências que contextualizam o problema? (Se sim, transcrever)
-Introdução, A lacuna de conhecimento é declarada explicitamente? (Se sim, transcrever)
-Introdução, O objetivo ou a pergunta de pesquisa está enunciado? (Se sim, transcrever)
-Metodologia, O delineamento do estudo é especificado? (Se sim, indicar qual)
-Metodologia, Plataforma ou sistema digital de captura de dados (EHR, aplicativo, sensor) está descrito com nome, versão e formato? (Se sim, resumir)
-Metodologia, O artigo informa aprovação ética ou registro do estudo? (Se sim, escrever o número/plataforma)
-Análise de dados, Métodos estatísticos/analíticos são descritos? (Se sim, listar)
-Análise de dados, Medidas de incerteza (IC, p-valor, tamanho de efeito) são apresentadas? (Se sim, listar)
-Análise de dados, Há validação do modelo ou análise de sensibilidade? (Se sim, resumir)
-Resultados, Resultados quantitativos principais (valor e unidade) são explicitados no texto ou em tabela? (Se sim, transcrever)
-Resultados, Existe seção ou parágrafo que vincula resultados ao objetivo de pesquisa? (Se sim, resumir)
-Conclusão, O artigo apresenta conclusões explícitas? (Se sim, resumir)
-Conclusão, As limitações do estudo são listadas? (Se sim, enumerar)
+Campo,Pergunta
+"Introdução","O texto fornece dados ou referências que contextualizam o problema? (Se sim, transcrever)"
+"Introdução","A lacuna de conhecimento é declarada explicitamente? (Se sim, transcrever)"
+"Introdução","O objetivo ou a pergunta de pesquisa está enunciado? (Se sim, transcrever)"
+"Metodologia","O delineamento do estudo é especificado? (Se sim, indicar qual)"
+"Metodologia","Plataforma ou sistema digital de captura de dados (EHR, aplicativo, sensor) está descrito com nome, versão e formato? (Se sim, resumir)"
+"Metodologia","O artigo informa aprovação ética ou registro do estudo? (Se sim, escrever o número/plataforma)"
+"Análise de dados","Métodos estatísticos/analíticos são descritos? (Se sim, listar)"
+"Análise de dados","Medidas de incerteza (IC, p-valor, tamanho de efeito) são apresentadas? (Se sim, listar)"
+"Análise de dados","Há validação do modelo ou análise de sensibilidade? (Se sim, resumir)"
+"Resultados","Resultados quantitativos principais (valor e unidade) são explicitados no texto ou em tabela? (Se sim, transcrever)"
+"Resultados","Existe seção ou parágrafo que vincula resultados ao objetivo de pesquisa? (Se sim, resumir)"
+"Conclusão","O artigo apresenta conclusões explícitas? (Se sim, resumir)"
+"Conclusão","As limitações do estudo são listadas? (Se sim, enumerar)"
